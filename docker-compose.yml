@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  projectx_fastapi:
+    build: .
+    container_name: projectx_api
+    restart: always
+    ports:
+      - "5002:5002"
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    restart: always
